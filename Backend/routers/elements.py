@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import os
-from services.parser import load_ifc_elements 
+from services.parser import load_ifc_elements, generate_element_summary
 
 router = APIRouter(prefix="/api/elements", tags=["Elements"])
 
@@ -14,7 +14,8 @@ def get_elements():
     elements = load_ifc_elements(IFC_FILE_PATH)
     if not elements:
         return {"error": "No elements found in the IFC file."} 
-    return {"elements": elements}
+    summary = generate_element_summary(elements)
+    return {"elements": summary}
 
 # This router returns a list of element IDs that belong to the given type
 @router.get("/by-type/{type}")
@@ -23,8 +24,9 @@ def get_elements_by_type(type: str):
     if not elements:
         return {"error": "No elements found in the IFC file."}
     # Filter elements by the specified type
-    filtered_elements = [element for element in elements if element["type"].lower() == type.lower()]
+    filtered_elements = [element for element in elements if element["type"].strip().lower() == type.strip().lower()]
     return {"elements": filtered_elements}
+
 
 
 # This router returns a list of element IDs that are located in a specific level

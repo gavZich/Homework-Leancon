@@ -9,7 +9,8 @@ from services.parser import (
     parse_ifc_file,
     load_ifc_elements,
     get_element_level,
-    extract_element_metadata
+    extract_element_metadata,
+    generate_element_summary
 )
 
 # Define absolute path to IFC file
@@ -35,3 +36,10 @@ print("\n Testing get_element_level and extract_element_metadata:::::")
 for element in model.by_type("IfcProduct"):
     metadata = extract_element_metadata(element)
     print(metadata)
+
+
+
+print("\n Testing generate_element_summary:::::")
+summary = generate_element_summary(elements)
+for row in summary:
+    print(row)
