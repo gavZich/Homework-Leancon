@@ -15,7 +15,7 @@ def get_elements():
     if not elements:
         return {"error": "No elements found in the IFC file."} 
     summary = generate_element_summary(elements)
-    return {"elements": summary}
+    return {"summary": summary}
 
 # This router returns a list of element IDs that belong to the given type
 @router.get("/by-type/{type}")

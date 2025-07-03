@@ -8,6 +8,6 @@ app = FastAPI()
 
 app.include_router(elements.router)
 
-@app.get("/")
+@app.get("/api/")
 def root():
     return {"message": "API is running"}

@@ -43,7 +43,7 @@ def extract_element_metadata(element):
                 break
 
     # Combine type + size as one identifier for the table
-    type_size = f"{type_name} | {size}"
+    type_size = f"{type_name} {size}"
 
     return {
         "id": global_id,
