@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.responses import FileResponse
 import os
 from services.parser import load_ifc_elements, generate_element_summary
 

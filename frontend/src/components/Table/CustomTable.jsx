@@ -36,30 +36,30 @@ export default function CustomTable() {
     }, []);
 
     return (
-        <div className='table-container'>
-            <h1 className='table-title'>Element Quantity Table</h1>
-            <Table striped bordered hover className='custom-table'>
+        <div className="table-section">
+            <h2 className="table-title">Element Quantity Table</h2>
+            <Table striped bordered hover className="custom-table">
                 <thead>
-                    <tr>
-                        <th>Element Type</th>
-                        <th>Unit</th>
-                        <th>Total Quantity</th>
-                        {levels.map((level, index) => (
-                            <th key={index}>{level}</th>
-                        ))}
-                    </tr>
+                <tr>
+                    <th>Element Type</th>
+                    <th>Unit</th>
+                    <th>Total Quantity</th>
+                    {levels.map((level, index) => (
+                    <th key={index}>{level}</th>
+                    ))}
+                </tr>
                 </thead>
                 <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.type_size}</td>
-                            <td>{item.unit}</td>
-                            <td>{item.total_quantity}</td>
-                            {levels.map((level, i) => (
-                                <td key={i}>{item[level] || 0}</td>
-                            ))}
-                        </tr>
+                {data.map((item, index) => (
+                    <tr key={index}>
+                    <td>{item.type_size}</td>
+                    <td>{item.unit}</td>
+                    <td>{item.total_quantity}</td>
+                    {levels.map((level, i) => (
+                        <td key={i}>{item[level] || 0}</td>
                     ))}
+                    </tr>
+                ))}
                 </tbody>
             </Table>
         </div>

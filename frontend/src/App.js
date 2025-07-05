@@ -1,11 +1,11 @@
+// src/App.js
 import React from 'react';
-import './App.css';
-import CustomTable from './components/Table/CustomTable'; // adjust if your path is different
+import IFCViewer from './components/3Dstructure/IFCViewer.jsx';
 
 function App() {
   return (
     <div className="App">
-      <CustomTable />
+      <IFCViewer />
     </div>
   );
 }
