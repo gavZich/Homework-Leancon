@@ -70,6 +70,7 @@ export default function SimpleIFCViewer() {
         // Fetch and load IFC file
         const loadIFC = async () => {
             try {
+                // Fetch the IFC file from the backend
                 const response = await fetch('/api/ifc-file/simple_example.ifc');
                 if (!response.ok) throw new Error('Failed to fetch IFC file');
                 
@@ -87,11 +88,11 @@ export default function SimpleIFCViewer() {
                 url,
                 (ifcModel) => {
                     scene.add(ifcModel);
-                    console.log('✅ IFC model loaded from public folder');
+                    console.log('IFC model loaded from public folder');
                 },
                 undefined,
                 (error) => {
-                    console.error('❌ Failed to parse IFC from public:', error);
+                    console.error('Failed to parse IFC from public:', error);
                 }
                 );
                 

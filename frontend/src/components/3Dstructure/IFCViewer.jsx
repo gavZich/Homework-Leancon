@@ -1,3 +1,5 @@
+// This component is a Debugging tool for viewing IFC file
+//  that extract from the file from 'public/models/simple_example.ifc'.
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { IFCLoader } from 'three/examples/jsm/loaders/IFCLoader.js';
@@ -40,7 +42,7 @@ const IFCViewer = () => {
 
     // IFC Loader
     const loader = new IFCLoader();
-    loader.ifcManager.setWasmPath('/'); // Make sure web-ifc.wasm is in /public/
+    loader.ifcManager.setWasmPath('/'); 
 
     loader.load('/models/simple_example.ifc', (ifcModel) => {
       scene.add(ifcModel);

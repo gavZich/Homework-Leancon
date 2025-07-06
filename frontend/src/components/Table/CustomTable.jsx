@@ -8,10 +8,11 @@ export default function CustomTable() {
 
     const fetchData = async () => {
         try {
+            // Fetch data from the API endpoint
             const response = await fetch('/api/elements/');
             const result = await response.json();
-            console.log("API result:", result);
-            setData(result.summary);
+            console.log("API result:", result); // display the elements
+            setData(result.summary); // set the data for the table
 
             if (result.summary.length > 0) {
                 const allLevels = new Set();

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 import os
 
@@ -8,28 +8,25 @@ router = APIRouter()
 # Configure your IFC files directory
 IFC_FILES_DIR = "data" 
 
+# API endpoint to serve IFC files to the frontend
 @router.get("/api/ifc-file/{filename}")
 async def get_ifc_file(filename: str):
-    """
-    Serve IFC file for 3D visualization
-    Returns the raw IFC file with proper headers
-    """
-    # Security: Only allow .ifc files and prevent directory traversal
-    if not filename.endswith('.ifc') or '..' in filename:
-        raise HTTPException(status_code=400, detail="Invalid file type")
-    
     file_path = Path(IFC_FILES_DIR) / filename
-    
+    # Ensure the directory exists
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    # Return file with proper headers for IFC files
-    return FileResponse(
-        path=file_path,
-        media_type='application/x-step',  # Standard MIME type for IFC files
-        filename=filename,
-        headers={
-            "Cache-Control": "no-cache",  # Prevent caching during development
-            "Access-Control-Allow-Origin": "*",  # Allow CORS for frontend
-        }
-    )
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "message": f"File '{filename}' not found."}
+        )
+    # Ensure the file is an IFC file
+    try:
+        return FileResponse(
+            path=file_path,
+            media_type="application/octet-stream",
+            filename=filename
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "message": f"Error reading file: {str(e)}"}
+        )
