@@ -41,6 +41,7 @@ uvicorn main:app --reload
 **run tasts -**
 python tests/test_parser.py
 
+------------------------------------------------------------------------------------
 
 ### Frontend
 
