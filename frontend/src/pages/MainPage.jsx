@@ -24,16 +24,3 @@ export default function MainPage() {
     </div>
   );
 }
-//   return (
-//     <div className="main-page">
-//       {/* Page title */}
-//       <h1 className="app-title">Smart BIM Dashboard</h1>
-
-    
-//       <Structure highlight={highlight} />
-
-     
-//       <CustomTable onHighlight={onHighlight} />
-//     </div>
-//   );
-// }
