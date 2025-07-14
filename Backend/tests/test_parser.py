@@ -14,7 +14,7 @@ from services.parser import (
 )
 
 # Define absolute path to IFC file
-ifc_relative_path = os.path.join("data", "simple_example.ifc")
+ifc_relative_path = os.path.join("data", "rstadvancedsampleproject.ifc")
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ifc_relative_path))
 
 print("\n Testing parse_ifc_file:::::")

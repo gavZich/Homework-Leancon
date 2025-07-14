@@ -6,7 +6,7 @@ from services.parser import load_ifc_elements, generate_element_summary
 router = APIRouter(prefix="/api/elements", tags=["Elements"])
 
 # Resolve absolute path to IFC file
-IFC_FILE_PATH = os.path.abspath("data/simple_example.ifc")
+IFC_FILE_PATH = os.path.abspath("data/rstadvancedsampleproject.ifc")
 
 
 # Rendering the entire Element Quantity Table
