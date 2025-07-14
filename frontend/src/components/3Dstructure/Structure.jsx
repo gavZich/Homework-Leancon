@@ -1,172 +1,133 @@
+// src/components/3Dstructure/Structure.jsx
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
-import { IFCLoader } from 'web-ifc-three/IFCLoader';
+import * as OBC from "@thatopen/components";
+import "@thatopen/components-front";
+import "@thatopen/fragments";
+import "@thatopen/ui";
+import "./Structure.css";
 
-export default function SimpleIFCViewer() {
-    const containerRef = useRef(null);
+export default function SimpleIFCViewer({ highlight }) {
+  const containerRef = useRef(null);
+  const loadedModel  = useRef(null);
 
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-        // Basic scene setup
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xf5f5f5);
+    // 1️⃣ Create ThatOpen world
+    const components = new OBC.Components();
+    const world      = components
+      .get(OBC.Worlds)
+      .create(OBC.SimpleScene, OBC.SimpleCamera, OBC.SimpleRenderer);
 
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            container.clientWidth / container.clientHeight,
-            0.1,
-            1000
-        );
-        camera.position.set(10, 10, 10);
+    world.scene    = new OBC.SimpleScene(components);
+    world.renderer = new OBC.SimpleRenderer(components, containerRef.current);
+    world.camera   = new OBC.SimpleCamera(components);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        container.appendChild(renderer.domElement);
-
-        // Simple orbit controls (mouse interaction)
-        let mouseDown = false;
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-        let currentX = 0;
-        let currentY = 0;
-
-        const handleMouseDown = (event) => {
-            mouseDown = true;
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-        };
-
-        const handleMouseMove = (event) => {
-            if (!mouseDown) return;
-            
-            const deltaX = event.clientX - mouseX;
-            const deltaY = event.clientY - mouseY;
-            
-            targetX += deltaX * 0.01;
-            targetY += deltaY * 0.01;
-            
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-        };
-
-        const handleMouseUp = () => {
-            mouseDown = false;
-        };
-
-        const handleWheel = (event) => {
-            const delta = event.deltaY * 0.01;
-            camera.position.multiplyScalar(1 + delta * 0.1);
-        };
-
-        container.addEventListener('mousedown', handleMouseDown);
-        container.addEventListener('mousemove', handleMouseMove);
-        container.addEventListener('mouseup', handleMouseUp);
-        container.addEventListener('wheel', handleWheel);
-
-        // Fetch and load IFC file
-        const loadIFC = async () => {
-            try {
-                // Fetch the IFC file from the backend
-                const response = await fetch('/api/ifc-file/simple_example.ifc');
-                if (!response.ok) throw new Error('Failed to fetch IFC file');
-                
-                const arrayBuffer = await response.arrayBuffer();
-                
-                // Load IFC using web-ifc-three
-                const ifcLoader = new IFCLoader();
-                ifcLoader.ifcManager.setWasmPath('https://unpkg.com/web-ifc@0.0.46/wasm/');
-                
-                const blob = new Blob([arrayBuffer]);
-                //const url = URL.createObjectURL(blob);
-                
-                const url = 'simple_example.ifc';
-                ifcLoader.load(
-                url,
-                (ifcModel) => {
-                    scene.add(ifcModel);
-                    console.log('IFC model loaded from public folder');
-                },
-                undefined,
-                (error) => {
-                    console.error('Failed to parse IFC from public:', error);
-                }
-                );
-                
-            } catch (error) {
-                console.error('Error loading IFC:', error);
-                
-                // Fallback: show simple placeholder
-                const fallbackGeometry = new THREE.BoxGeometry(2, 2, 2);
-                const fallbackMaterial = new THREE.MeshBasicMaterial({ 
-                    color: 0xff6b6b,
-                    wireframe: true
-                });
-                const fallback = new THREE.Mesh(fallbackGeometry, fallbackMaterial);
-                scene.add(fallback);
-            }
-        };
-
-        loadIFC();
-
-        // Animation loop
-        const animate = () => {
-            requestAnimationFrame(animate);
-            
-            // Smooth camera rotation
-            currentX += (targetX - currentX) * 0.1;
-            currentY += (targetY - currentY) * 0.1;
-            
-            const radius = camera.position.length();
-            camera.position.x = radius * Math.cos(currentX) * Math.cos(currentY);
-            camera.position.y = radius * Math.sin(currentY);
-            camera.position.z = radius * Math.sin(currentX) * Math.cos(currentY);
-            
-            camera.lookAt(0, 0, 0);
-            
-            renderer.render(scene, camera);
-        };
-        animate();
-
-        // Handle window resize
-        const handleResize = () => {
-            if (!container) return;
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        };
-        window.addEventListener('resize', handleResize);
-
-        // Cleanup
-        return () => {
-            container.removeEventListener('mousedown', handleMouseDown);
-            container.removeEventListener('mousemove', handleMouseMove);
-            container.removeEventListener('mouseup', handleMouseUp);
-            container.removeEventListener('wheel', handleWheel);
-            window.removeEventListener('resize', handleResize);
-            
-            if (container && container.contains(renderer.domElement)) {
-                container.removeChild(renderer.domElement);
-            }
-            
-            renderer.dispose();
-        };
-    }, []);
-
-    return (
-        <div 
-            ref={containerRef} 
-            style={{
-                width: '100%',
-                height: '500px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                cursor: 'grab',
-                background: '#f9f9f9'
-            }}
-        />
+    // 2️⃣ Lights & grid
+    const threeScene = world.scene.three;
+    threeScene.background = new THREE.Color(0xf5f5f5);
+    threeScene.add(
+      new THREE.AmbientLight(0xffffff, 0.5),
+      (() => {
+        const dl = new THREE.DirectionalLight(0xffffff, 0.5);
+        dl.position.set(5, 10, 7.5);
+        return dl;
+      })()
     );
+    components.get(OBC.Grids).create(world);
+
+    // 3️⃣ Start the render loop
+    components.init();
+
+    // 4️⃣ IFC → Fragments conversion wrapped in try/catch
+    (async () => {
+      const ifcLoader = components.get(OBC.IfcLoader);
+      const fragments = components.get(OBC.FragmentsManager);
+
+      try {
+        fragments.init(
+          "https://thatopen.github.io/engine_fragment/resources/worker.mjs"
+        );
+
+        await ifcLoader.setup({
+          autoSetWasm: false,
+          wasm: {
+            path:   "/web-ifc.wasm",
+            mtPath: "/web-ifc-mt.wasm",
+            absolute: true,
+          },
+        });
+
+        fragments.list.onItemSet.add(({ value: model }) => {
+          loadedModel.current = model;
+          threeScene.add(model.object);
+        });
+
+        const resp = await fetch("/api/ifc-file/simple_example.ifc");
+        if (!resp.ok) {
+          console.warn("IFC fetch failed:", resp.status);
+          return;
+        }
+        const buffer = await resp.arrayBuffer();
+        const bytes  = new Uint8Array(buffer);
+
+        await ifcLoader.load(bytes, false, "myModel", {
+          processData: { progressCallback: (p) => console.log("IFC→Fragments", p) },
+        });
+      } catch (e) {
+        console.warn("IFC→Fragments step skipped due to error:", e);
+      }
+    })();
+
+    // 5️⃣ Cleanup on unmount (guarded)
+    return () => {
+      try {
+        components.dispose();
+      } catch (e) {
+        console.warn("components.dispose() threw, ignoring:", e);
+      }
+    };
+  }, []);
+
+  // 6️⃣ React to highlight changes
+  useEffect(() => {
+    const model = loadedModel.current;
+    if (!model || !highlight?.value) return;
+
+    try {
+      const { type, value } = highlight;
+
+      if (type === "level") {
+        model.object.traverse((mesh) => {
+          if (!mesh.isMesh) return;
+          mesh.material = mesh.material.clone();
+          mesh.material.emissive =
+            mesh.userData.storey === value
+              ? new THREE.Color(0xffd54f)
+              : new THREE.Color(0x000000);
+        });
+      }
+
+      if (type === "element") {
+        model.object.traverse((mesh) => {
+          if (!mesh.isMesh) return;
+          mesh.material = mesh.material.clone();
+          mesh.material.emissive =
+            mesh.userData.type_size === value
+              ? new THREE.Color(0x4fc3f7)
+              : new THREE.Color(0x000000);
+        });
+      }
+    } catch (e) {
+      console.warn("Highlight application failed:", e);
+    }
+  }, [highlight]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="viewer-container"
+    />
+  );
 }

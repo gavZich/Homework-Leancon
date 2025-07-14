@@ -1,15 +1,39 @@
-import React from 'react';
+// src/pages/MainPage.jsx
+import React, { useState } from 'react';
 import Structure from '../components/3Dstructure/Structure';
-// debugg
-// import SimpleIFCViewer from '../components/3Dstructure/IFCViewer.jsx';
 import CustomTable from '../components/Table/CustomTable';
 import './MainPage.css';
 
 export default function MainPage() {
-    return (
-        <div style={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
-            <Structure />
-            <CustomTable />
-        </div>
-    );
+  // Lift highlight state here
+  const [highlight, setHighlight] = useState({
+    type:  null,  // "level" / "element"
+    value: null,  // "Level 1" / "IfcColumn 450 x 600mm"
+  });
+
+  return (
+    <div className="main-page">
+      {/* Page title */}
+      <h1 className="app-title">Smart BIM Dashboard</h1>
+
+        {/* 3D Viewer */}
+      <Structure highlight={highlight} />
+
+       {/* Quantities table */}
+      <CustomTable onHighlight={setHighlight} />
+    </div>
+  );
 }
+//   return (
+//     <div className="main-page">
+//       {/* Page title */}
+//       <h1 className="app-title">Smart BIM Dashboard</h1>
+
+    
+//       <Structure highlight={highlight} />
+
+     
+//       <CustomTable onHighlight={onHighlight} />
+//     </div>
+//   );
+// }

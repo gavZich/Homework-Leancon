@@ -1,17 +1,17 @@
 # --- Frontend ---
 frontend/node_modules/
 frontend/build/
-frontend/.DS_Store
 frontend/.env
+frontend/.DS_Store
 
 # --- Backend ---
-Backend/__pycache__/
-Backend/.pytest_cache/
-Backend/.vscode/
-Backend/.env
-Backend/venv/
-Backend/env/
-Backend/*.pyc
+backend/venv/
+backend/env/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/.vscode/
+backend/.env
+backend/*.py[cod]
 
 # --- Global Python Envs ---
 .venv/
@@ -23,10 +23,10 @@ AddsFiles/
 *.log
 .DS_Store
 Thumbs.db
-.vscode/
-.idea/
-*.swp
-
-# --- OS files ---
 ehthumbs.db
 Icon?
+*.swp
+
+# --- IDE Folders ---
+.vscode/
+.idea/
