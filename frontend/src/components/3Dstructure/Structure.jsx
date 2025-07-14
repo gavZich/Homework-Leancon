@@ -9,8 +9,9 @@ import "./Structure.css";
 
 export default function SimpleIFCViewer({ highlight }) {
   const containerRef = useRef(null);
-  const loadedModel  = useRef(null);
+  const loadedModel  = useRef(null); // Reference to the loaded model
 
+  // Handle Highlighting state
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -61,17 +62,18 @@ export default function SimpleIFCViewer({ highlight }) {
 
         fragments.list.onItemSet.add(({ value: model }) => {
           loadedModel.current = model;
+          // Add model to the scene
           threeScene.add(model.object);
         });
 
-        const resp = await fetch("/api/ifc-file/simple_example.ifc");
+        const resp = await fetch("/api/ifc-file/rstadvancedsampleproject.ifc");
         if (!resp.ok) {
           console.warn("IFC fetch failed:", resp.status);
           return;
         }
         const buffer = await resp.arrayBuffer();
         const bytes  = new Uint8Array(buffer);
-
+        // Load IFC file into fragments
         await ifcLoader.load(bytes, false, "myModel", {
           processData: { progressCallback: (p) => console.log("IFC→Fragments", p) },
         });

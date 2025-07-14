@@ -13,6 +13,7 @@ export default function CustomTable({ onHighlight }) {
       const result   = await response.json();
       setData(result.summary);
       if (result.summary.length > 0) {
+        // Extract unique levels from the data
         const allLevels = new Set();
         result.summary.forEach(item =>
           Object.keys(item).forEach(key => {
@@ -30,6 +31,7 @@ export default function CustomTable({ onHighlight }) {
 
   useEffect(() => { fetchData(); }, []);
 
+  // Safe highlight function to handle potential errors
   const safeHighlight = payload => {
     try {
       onHighlight(payload);
@@ -44,6 +46,7 @@ export default function CustomTable({ onHighlight }) {
       <Table striped hover className="custom-table">
         <thead>
           <tr>
+            {/* Header row with buttons for highlighting */}
             <th>Element Type</th>
             <th>Unit</th>
             <th>Total Quantity</th>
