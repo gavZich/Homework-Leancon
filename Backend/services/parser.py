@@ -3,7 +3,7 @@ from collections import defaultdict
 
 print(ifcopenshell.version)
 
-# Parses and opens an IFC model from file
+# Parses and *opens* an IFC model from file
 def parse_ifc_file(file_path):
     try:
         model = ifcopenshell.open(file_path)
@@ -12,13 +12,13 @@ def parse_ifc_file(file_path):
         print(f"Error parsing IFC file: {e}")
         return None
 
-# Determines the level (IfcBuildingStorey) an element belongs to
+# Determines the *level* (IfcBuildingStorey) an element belongs to
 def get_element_level(element):
     try:
-        if hasattr(element, "ContainedInStructure"):
+        if hasattr(element, "ContainedInStructure"): # Check if the element has a containment relationship
             for rel in element.ContainedInStructure:
                 if hasattr(rel, "RelatingStructure"):
-                    level = rel.RelatingStructure
+                    level = rel.RelatingStructure # define the level as the relating structure
                     if level.is_a("IfcBuildingStorey") and hasattr(level, "Name"):
                         return level.Name
     except:
@@ -27,6 +27,7 @@ def get_element_level(element):
 
 # Extracts metadata from an IFC element
 def extract_element_metadata(element):
+    # Extract and define the metadate for the element
     name = element.Name if hasattr(element, "Name") else "Unnamed"
     global_id = element.GlobalId if hasattr(element, "GlobalId") else "Unknown"
     type_name = element.is_a()
@@ -34,6 +35,7 @@ def extract_element_metadata(element):
 
     # Extract size from the name
     size = "Unknown"
+    # break down the name to find size information
     if name and ":" in name:
         parts = name.split(":")
         # Assuming the size is part of the name after a colon
@@ -60,9 +62,11 @@ def load_ifc_elements(file_path):
     if not model:
         return []
 
+    # Collect all elements of type IfcProduct
     elements = []
     for element in model.by_type("IfcProduct"):
         if hasattr(element, "Name") and hasattr(element, "GlobalId"):
+            # Extract metadata for each element
             metadata = extract_element_metadata(element)
             elements.append(metadata)
     return elements
@@ -89,16 +93,18 @@ def generate_element_summary(elements):
     levels_set = set()
 
     for element in elements:
+        # Extracting key information (already insert) for summary
         key = element["type_size"]
         level = element["level"]
         levels_set.add(level)
 
         if key not in summary:
+            # Building the summary structure for the Table
             summary[key] = {
                 "type_size": key,
                 "unit": infer_unit(element["type"]),
                 "total_quantity": 0,
-                "levels": defaultdict(int)
+                "levels": defaultdict(int) # Generic dictionary to count levels
             }
 
         summary[key]["total_quantity"] += 1
